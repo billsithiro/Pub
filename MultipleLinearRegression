@@ -1,0 +1,34 @@
+// class to perform multiple linear regression with matricies
+public class MultipleLinearRegression {
+    // create a function to perform multiple linear regression
+    public static double[] MultipleLinearRegression(double[,] x, double[] y) {
+        // create a matrix to hold the x values
+        Matrix xMatrix = new Matrix(x);
+        // create a matrix to hold the y values
+        Matrix yMatrix = new Matrix(y);
+        // create a matrix to hold the transpose of the x values
+        Matrix xTransposed = xMatrix.Transpose();
+        // create a matrix to hold the product of the x transpose and x
+        Matrix xTransposedX = xTransposed * xMatrix;
+        // create a matrix to hold the inverse of the x transpose x
+        Matrix xTransposedXInverse = xTransposedX.Inverse();
+        // create a matrix to hold the product of the x transpose x inverse and x transpose
+        Matrix xTransposedXInverseXTransposed = xTransposedXInverse * xTransposed;
+        // create a matrix to hold the product of the x transpose x inverse x transpose and y
+        Matrix xTransposedXInverseXTransposedY = xTransposedXInverseXTransposed * yMatrix;
+        // return the values of the matrix
+        return xTransposedXInverseXTransposedY.Values;
+    }
+
+    // create a function to predict multiple linear regression
+    public static double[] PredictMultipleLinearRegression(double[,] x, double[] coefficients) {
+        // create a matrix to hold the x values
+        Matrix xMatrix = new Matrix(x);
+        // create a matrix to hold the coefficients
+        Matrix coefficientsMatrix = new Matrix(coefficients);
+        // create a matrix to hold the product of the x and coefficients
+        Matrix xCoefficients = xMatrix * coefficientsMatrix;
+        // return the values of the matrix
+        return xCoefficients.Values;
+    }
+}
