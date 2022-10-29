@@ -1,381 +1,404 @@
-// create a class to perform matrix calculations
-public class Matrix {
-    // create a field to hold the values
-    private double[,] values;
-    // create a field to hold the rows
-    private int rows;
-    // create a field to hold the columns
-    private int columns;
+// create a class to perform matrix operations
+public class Matrix
+{        
+    // create a method to multiply two matrices
+    public static double[,] Multiply(double[,] a, double[,] b)
+    {
 
-    // create a constructor to create a matrix from values
-    public Matrix(double[,] values) {
-        // set the values
-        this.values = values;
-        // set the rows
-        this.rows = values.GetLength(0);
-        // set the columns
-        this.columns = values.GetLength(1);
-    }
+        // get the number of rows in the first matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the first matrix
+        int aCols = a.GetLength(1);
+        // get the number of rows in the second matrix
+        int bRows = b.GetLength(0);
+        // get the number of columns in the second matrix
+        int bCols = b.GetLength(1);
 
-    // create a constructor to create a matrix from rows and columns
-    public Matrix(int rows, int columns) {
-        // set the values
-        this.values = new double[rows, columns];
-        // set the rows
-        this.rows = rows;
-        // set the columns
-        this.columns = columns;
-    }
-
-    // create a constructor to create a matrix from a vector
-    public Matrix(double[] vector) {
-        // set the values
-        this.values = new double[vector.Length, 1];
-        // set the rows
-        this.rows = vector.Length;
-        // set the columns
-        this.columns = 1;
-        // for each row
-        for (int i = 0; i < this.rows; i++) {
-            // set the value
-            this.values[i, 0] = vector[i];
+        // check if the number of columns in the first matrix is equal to the number of rows in the second matrix
+        if (aCols != bRows)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of columns in the first matrix must be equal to the number of rows in the second matrix.");
         }
-    }
 
-    // create a property to get the values
-    public double[,] Values {
-        get { return this.values; }
-    }
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, bCols];
 
-    // create a property to get the rows
-    public int Rows {
-        get { return this.rows; }
-    }
-
-    // create a property to get the columns
-    public int Columns {
-        get { return this.columns; }
-    }
-
-    // create an operator to add two matrices
-    public static Matrix operator +(Matrix a, Matrix b) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, a.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < a.Columns; j++) {
-                // add the values
-                matrix.values[i, j] = a.values[i, j] + b.values[i, j];
-            }
-        }
-        // return the matrix
-        return
-    }
-
-    // create an operator to subtract two matrices
-    public static Matrix operator -(Matrix a, Matrix b) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, a.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < a.Columns; j++) {
-                // subtract the values
-                matrix.values[i, j] = a.values[i, j] - b.values[i, j];
-            }
-        }
-        // return the matrix
-        return matrix;
-    }
-
-    // create an operator to multiply two matrices
-    public static Matrix operator *(Matrix a, Matrix b) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, b.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < b.Columns; j++) {
-                // for each value
-                for (int k = 0; k < a.Columns; k++) {
-                    // multiply the values
-                    matrix.values[i, j] += a.values[i, k] * b.values[k, j];
+        // loop through the rows in the first matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the second matrix
+            for (int j = 0; j < bCols; j++)
+            {
+                // loop through the rows in the second matrix
+                for (int k = 0; k < bRows; k++)
+                {
+                    // multiply the values in the first matrix by the values in the second matrix
+                    result[i, j] += a[i, k] * b[k, j];
                 }
             }
         }
-        // return the matrix
-        return matrix;
-    }
 
-    // create an operator to multiply a matrix by a scalar
-    public static Matrix operator *(Matrix a, double scalar) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, a.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < a.Columns; j++) {
-                // multiply the values
-                matrix.values[i, j] = a.values[i, j] * scalar;
-            }
-        }
-        // return the matrix
-        return matrix;
-    }
-
-    // create an operator to multiply a scalar by a matrix
-    public static Matrix operator *(double scalar, Matrix a) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, a.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < a.Columns; j++) {
-                // multiply the values
-                matrix.values[i, j] = a.values[i, j] * scalar;
-            }
-        }
-        // return the matrix
-        return matrix;
-    }
-
-    // create an operator to divide a matrix by a scalar
-    public static Matrix operator /(Matrix a, double scalar) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(a.Rows, a.Columns);
-        // for each row
-        for (int i = 0; i < a.Rows; i++) {
-            // for each column
-            for (int j = 0; j < a.Columns; j++) {
-                // divide the values
-                matrix.values[i, j] = a.values[i, j] / scalar;
-            }
-        }
-        // return the matrix
-        return matrix;
+        // return the result
+        return result;
     }
 
     // create a method to transpose a matrix
-    public Matrix Transpose() {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(this.Columns, this.Rows);
-        // for each row
-        for (int i = 0; i < this.Rows; i++) {
-            // for each column
-            for (int j = 0; j < this.Columns; j++) {
-                // transpose the values
-                matrix.values[j, i] = this.values[i, j];
+    public static double[,] Transpose(double[,] a)
+    {
+
+        // get the number of rows in the matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the matrix
+        int aCols = a.GetLength(1);
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aCols, aRows];
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // transpose the values in the matrix
+                result[j, i] = a[i, j];
             }
         }
-        // return the matrix
-        return matrix;
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the determinant of a matrix
-    public double Determinant() {
-        // create a variable to hold the determinant
-        double determinant = 0;
-        // if the matrix is 1x1
-        if (this.Rows == 1 && this.Columns == 1) {
-            // set the determinant
-            determinant = this.values[0, 0];
+    // create a method to subtract two matrices
+    public static double[,] Subtract(double[,] a, double[,] b)
+    {
+
+        // get the number of rows in the first matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the first matrix
+        int aCols = a.GetLength(1);
+        // get the number of rows in the second matrix
+        int bRows = b.GetLength(0);
+        // get the number of columns in the second matrix
+        int bCols = b.GetLength(1);
+
+        // check if the number of rows in the first matrix is equal to the number of rows in the second matrix
+        if (aRows != bRows)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of rows in the first matrix must be equal to the number of rows in the second matrix.");
         }
-        // if the matrix is 2x2
-        else if (this.Rows == 2 && this.Columns == 2) {
-            // set the determinant
-            determinant = this.values[0, 0] * this.values[1, 1] - this.values[0, 1] * this.values[1, 0];
+
+        // check if the number of columns in the first matrix is equal to the number of columns in the second matrix
+        if (aCols != bCols)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of columns in the first matrix must be equal to the number of columns in the second matrix.");
         }
-        // if the matrix is 3x3
-        else if (this.Rows == 3 && this.Columns == 3) {
-            // set the determinant
-            determinant = this.values[0, 0] * this.values[1, 1] * this.values[2, 2] + this.values[0, 1] * this.values[1, 2] * this.values[2, 0] + this.values[0, 2] * this.values[1, 0] * this.values[2, 1] - this.values[0, 2] * this.values[1, 1] * this.values[2, 0] - this.values[0, 1] * this.values[1, 0] * this.values[2, 2] - this.values[0, 0] * this.values[1, 2] * this.values[2, 1];
-        }
-        // if the matrix is 4x4 or larger
-        else {
-            // for each column
-            for (int j = 0; j < this.Columns; j++) {
-                // add the determinant
-                determinant += this.values[0, j] * this.Cofactor(0, j);
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // loop through the rows in the first matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the first matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // subtract the values in the second matrix from the values in the first matrix
+                result[i, j] = a[i, j] - b[i, j];
             }
         }
-        // return the determinant
-        return determinant;
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the cofactor of a matrix
-    public double Cofactor(int row, int column) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(this.Rows - 1, this.Columns - 1);
-        // for each row
-        for (int i = 0; i < this.Rows; i++) {
-            // if the row is not the row to remove
-            if (i != row) {
-                // for each column
-                for (int j = 0; j < this.Columns; j++) {
-                    // if the column is not the column to remove
-                    if (j != column) {
-                        // set the value
-                        matrix.values[i < row ? i : i - 1, j < column ? j : j - 1] = this.values[i, j];
+    // create a method to add two matrices
+    public static double[,] Add(double[,] a, double[,] b)
+    {
+
+        // get the number of rows in the first matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the first matrix
+        int aCols = a.GetLength(1);
+        // get the number of rows in the second matrix
+        int bRows = b.GetLength(0);
+        // get the number of columns in the second matrix
+        int bCols = b.GetLength(1);
+
+        // check if the number of rows in the first matrix is equal to the number of rows in the second matrix
+        if (aRows != bRows)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of rows in the first matrix must be equal to the number of rows in the second matrix.");
+        }
+
+        // check if the number of columns in the first matrix is equal to the number of columns in the second matrix
+        if (aCols != bCols)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of columns in the first matrix must be equal to the number of columns in the second matrix.");
+        }
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // loop through the rows in the first matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the first matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // add the values in the first matrix to the values in the second matrix
+                result[i, j] = a[i, j] + b[i, j];
+            }
+        }
+
+        // return the result
+        return result;
+    }
+
+    // create a method to multiply a 6 by 4 matrix by a 6 element array
+    public static double[] Multiply(double[,] a, double[] b)
+    {
+
+        // get the number of rows in the matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the matrix
+        int aCols = a.GetLength(1);
+
+        // check if the number of columns in the matrix is equal to the number of elements in the array
+        if (aCols != b.Length)
+        {
+            // if not, throw an exception
+            throw new Exception("The number of columns in the matrix must be equal to the number of elements in the array.");
+        }
+
+        // create a new array to hold the result
+        double[] result = new double[aRows];
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // multiply the values in the matrix by the values in the array
+                result[i] += a[i, j] * b[j];
+            }
+        }
+
+        // return the result
+        return result;
+    }
+
+    // create a method to multiply a matrix by a scalar
+    public static double[,] Multiply(double[,] a, double b)
+    {
+
+        // get the number of rows in the matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the matrix
+        int aCols = a.GetLength(1);
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // multiply the values in the matrix by the scalar
+                result[i, j] = a[i, j] * b;
+            }
+        }
+
+        // return the result
+        return result;
+    }
+
+    // create a method to inverse a matrix
+    public static double[,] Inverse(double[,] a)
+    {
+        int rows = a.GetLength(0);
+        int cols = a.GetLength(1);
+        if (rows != cols)
+            throw new Exception("Matrix must be square");
+
+        double[,] ret = new double[rows, rows];
+        for (int i = 0; i < rows; i++)
+        {
+            for (int j = 0; j < rows; j++)
+            {
+                ret[i, j] = (i == j) ? 1 : 0;
+            }
+        }
+        for (int i = 0; i < rows; i++)
+        {
+            double pivot = a[i, i];
+            if (pivot == 0)
+            {
+                for (int j = i + 1; j < rows; j++)
+                {
+                    if (a[j, i] != 0)
+                    {
+                        for (int k = 0; k < rows; k++)
+                        {
+                            double t = a[i, k];
+                            a[i, k] = a[j, k];
+                            a[j, k] = t;
+                            t = ret[i, k];
+                            ret[i, k] = ret[j, k];
+                            ret[j, k] = t;
+                        }
+                        pivot = a[i, i];
+                        break;
+                    }
+                }
+            }
+
+            if (pivot == 0)
+                throw new Exception("Matrix is singular");
+
+            for (int j = 0; j < rows; j++)
+            {
+                a[i, j] /= pivot;
+                ret[i, j] /= pivot;
+            }
+
+            for (int j = 0; j < rows; j++)
+            {
+                if (i != j)
+                {
+                    double multiplier = a[j, i];
+                    for (int k = 0; k < rows; k++)
+                    {
+                        a[j, k] -= multiplier * a[i, k];
+                        ret[j, k] -= multiplier * ret[i, k];
                     }
                 }
             }
         }
-        // return the cofactor
-        return matrix.Determinant() * (row + column % 2 == 0 ? 1 : -1);
+
+        return ret;
     }
 
-    // create a method to get the inverse of a matrix
-    public Matrix Inverse() {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(this.Rows, this.Columns);
-        // for each row
-        for (int i = 0; i < this.Rows; i++) {
-            // for each column
-            for (int j = 0; j < this.Columns; j++) {
-                // set the value
-                matrix.values[i, j] = this.Cofactor(i, j);
+    // create a method to create an identity matrix
+    public static double[,] Identity(int aRows, int aCols)
+    {
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // check if the current row is equal to the current column
+                if (i == j)
+                {
+                    // if so, set the value to one
+                    result[i, j] = 1;
+                }
+                else
+                {
+                    // if not, set the value to zero
+                    result[i, j] = 0;
+                }
             }
         }
-        // return the inverse
-        return matrix.Transpose() / this.Determinant();
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the identity matrix
-    public static Matrix Identity(int size) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(size, size);
-        // for each row
-        for (int i = 0; i < size; i++) {
-            // set the value
-            matrix.values[i, i] = 1;
-        }
-        // return the matrix
-        return matrix;
+    // create a method to create a matrix filled with zeros
+    public static double[,] Zeros(int aRows, int aCols)
+    {
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the zero matrix
-    public static Matrix Zero(int rows, int columns) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(rows, columns);
-        // for each row
-        for (int i = 0; i < rows; i++) {
-            // for each column
-            for (int j = 0; j < columns; j++) {
-                // set the value
-                matrix.values[i, j] = 0;
+    // create a method to create a matrix filled with ones
+    public static double[,] Ones(int aRows, int aCols)
+    {
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // set the value to one
+                result[i, j] = 1;
             }
         }
-        // return the matrix
-        return matrix;
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the rotation matrix
-    public static Matrix Rotation(double angle) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = Math.Cos(angle);
-        matrix.values[0, 1] = -Math.Sin(angle);
-        matrix.values[1, 0] = Math.Sin(angle);
-        matrix.values[1, 1] = Math.Cos(angle);
-        matrix.values[2, 2] = 1;
-        // return the matrix
-        return matrix;
+    // create a method to create a matrix filled with random values
+    public static double[,] Random(int aRows, int aCols)
+    {
+
+        // create a new matrix to hold the result
+        double[,] result = new double[aRows, aCols];
+
+        // create a new random number generator
+        Random random = new Random();
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // set the value to a random number between zero and one
+                result[i, j] = random.NextDouble();
+            }
+        }
+
+        // return the result
+        return result;
     }
 
-    // create a method to get the translation matrix
-    public static Matrix Translation(double x, double y) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = 1;
-        matrix.values[1, 1] = 1;
-        matrix.values[2, 2] = 1;
-        matrix.values[2, 0] = x;
-        matrix.values[2, 1] = y;
-        // return the matrix
-        return matrix;
+    // create a method to print a matrix
+    public static void Print(double[,] a)
+    {
+
+        // get the number of rows in the matrix
+        int aRows = a.GetLength(0);
+        // get the number of columns in the matrix
+        int aCols = a.GetLength(1);
+
+        // loop through the rows in the matrix
+        for (int i = 0; i < aRows; i++)
+        {
+            // create a new string to hold the row
+            string row = "";
+            // loop through the columns in the matrix
+            for (int j = 0; j < aCols; j++)
+            {
+                // add the value in the matrix to the row
+                row += a[i, j] + " ";
+            }
+            // print the row
+            Console.WriteLine(row);
+        }
     }
 
-    // create a method to get the scaling matrix
-    public static Matrix Scaling(double x, double y) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = x;
-        matrix.values[1, 1] = y;
-        matrix.values[2, 2] = 1;
-        // return the matrix
-        return matrix;
-    }
-
-    // create a method to get the shear matrix
-    public static Matrix Shear(double x, double y) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = 1;
-        matrix.values[1, 1] = 1;
-        matrix.values[2, 2] = 1;
-        matrix.values[0, 1] = x;
-        matrix.values[1, 0] = y;
-        // return the matrix
-        return matrix;
-    }
-
-    // create a method to get the reflection matrix
-    public static Matrix Reflection(double angle) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = Math.Cos(2 * angle);
-        matrix.values[0, 1] = Math.Sin(2 * angle);
-        matrix.values[1, 0] = Math.Sin(2 * angle);
-        matrix.values[1, 1] = -Math.Cos(2 * angle);
-        matrix.values[2, 2] = 1;
-        // return the matrix
-        return matrix;
-    }
-
-    // create a method to get the projection matrix
-    public static Matrix Projection(double angle) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = 1;
-        matrix.values[1, 1] = 1;
-        matrix.values[2, 2] = 1;
-        matrix.values[2, 0] = Math.Tan(angle);
-        // return the matrix
-        return matrix;
-    }
-
-    // create a method to get the skew matrix
-    public static Matrix Skew(double angle) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(3, 3);
-        // set the values
-        matrix.values[0, 0] = 1;
-        matrix.values[1, 1] = 1;
-        matrix.values[2, 2] = 1;
-        matrix.values[0, 2] = Math.Tan(angle);
-        // return the matrix
-        return matrix;
-    }
-
-    // create a method to get the perspective matrix
-    public static Matrix Perspective(double angle) {
-        // create a matrix to hold the values
-        Matrix matrix = new Matrix(4, 4);
-        // set the values
-        matrix.values[0, 0] = 1;
-        matrix.values[1, 1] = 1;
-        matrix.values[2, 2] = 1;
-        matrix.values[3, 3] = 1;
-        matrix.values[3, 2] = Math.Tan(angle);
-        // return the matrix
-        return matrix;
-    }
-}
 }
