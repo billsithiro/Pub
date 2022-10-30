@@ -27,8 +27,8 @@ namespace Pub
                     { 3000, 4, 15 },
                     { 3200, 4, 18 },
                     { 3600, 3, 30 },
-                    { 4000, 5, 8 },
-                    { 4100, 6, 8 }
+                    { 4000, 5, 8  },
+                    { 4100, 6, 8  }
             }, prices);            
 
             var result = MLR.Predict(new double[,] { { 3000, 3, 40 } }, coefs2);
@@ -40,12 +40,12 @@ namespace Pub
                     { 5,   6,   7,   60000 },
                     { 2,   10,  10,  65000 },
                     { 7,   9,   6,   70000 },
-                    { 3,   7,   10 , 62000 },
+                    { 3,   7,   10,  62000 },
                     { 10,  7,   7,   72000 },
                     { 11,  7,   8,   80000 }
             }, 3);            
             Console.WriteLine(string.Join(" ", MLR.Predict(new double[,] { { 2, 9, 6 }, { 12, 10, 10 } }, coefs3)));
-            Console.WriteLine(string.Join(" ", MLR.Predict(new double[] { 12, 10, 10 }, coefs3)));
+            Console.WriteLine(MLR.Predict(new double[] { 12, 10, 10 }, coefs3));
 
         }
     }

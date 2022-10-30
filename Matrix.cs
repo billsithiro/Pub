@@ -105,7 +105,6 @@ namespace Pub
         // create a method to multiply two matrices
         public static double[,] Multiply(double[,] a, double[,] b)
         {
-
             // get the number of rows in the first matrix
             int aRows = a.GetLength(0);
             // get the number of columns in the first matrix

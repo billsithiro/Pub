@@ -280,13 +280,12 @@ namespace Pub
         }
 
         // create a function to predict yhat from a vector of independant variables
-        public static double[] Predict(double[] x, double[] coeffs)
+        public static double Predict(double[] x, double[] coeffs)
         {
             // create a matrix from the vector and tranpsoe it
             double[,] X = Matrix.Transpose(Matrix.FromVector(x));
             // perform the prediction
-            return Predict(X, coeffs);
-            
+            return Predict(X, coeffs)[0];            
         }
     }
 
