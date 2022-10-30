@@ -9,10 +9,11 @@ using System.Diagnostics;
 
 namespace Pub
 {
+    // create a class to perform simple linear regression calculations
     public class SLR
     {
-        // create a function to calculate the linear regression
-        public static double[] Coefficients(double[] x, double[] y)
+        // create a function to calculate the coefs of a linear regression (m and b)
+        public static double[] Calculate(double[] x, double[] y)
         {
             double[] result = new double[2];
             double xSum = x.Sum();
@@ -23,28 +24,48 @@ namespace Pub
             double m = (count * xySum - xSum * ySum) / (count * x2Sum - xSum * xSum);
             double b = (ySum - m * xSum) / count;
 
-            result[0] = m;
-            result[1] = b;
+            result[0] = m; // coef
+            result[1] = b; // intercept
 
             return result;
         }
+
+        // create function to predict y given calculated coefs
+        public static double Predict(double x, double[] coefs)
+        {
+            // y = mx+b;
+            return coefs[0] * x + coefs[1];
+        }
+
+        // create function to predict a y vector given calculated coefs
+        public static double[] Predict(double[] x, double[] coefs)
+        {
+            // create array to hold results
+            double[] results = new double[x.Length];
+            // loop through vector and results
+            for (int i = 0; i < x.Length; i++)
+                results[i] = Predict(x[i], coefs);
+            // return the results
+            return results;
+        }
     }
 
+    // create a class to perform simple linear regression calculations w/ statistics
     public class SSLR
     {
         // create a function to calculate the mean of a list of numbers
-        public double Mean(List<double> values)
+        public double Mean(double[] values)
         {
             double sum = 0;
             foreach (double value in values)
             {
                 sum += value;
             }
-            return sum / values.Count;
+            return sum / values.Length;
         }
 
         // create a function to calculate the standard deviation of a list of numbers
-        public double StandardDeviation(List<double> values)
+        public double StandardDeviation(double[] values)
         {
             double mean = Mean(values);
             double sum = 0;
@@ -52,61 +73,69 @@ namespace Pub
             {
                 sum += Math.Pow(value - mean, 2);
             }
-            return Math.Sqrt(sum / (values.Count - 1));
+            return Math.Sqrt(sum / (values.Length - 1));
         }
 
         // create a function to calculate the covariance between two lists of numbers
-        public double Covariance(List<double> values1, List<double> values2)
+        public double Covariance(double[] values1, double[] values2)
         {
             double mean1 = Mean(values1);
             double mean2 = Mean(values2);
             double sum = 0;
-            for (int i = 0; i < values1.Count; i++)
+            for (int i = 0; i < values1.Length; i++)
             {
                 sum += (values1[i] - mean1) * (values2[i] - mean2);
             }
-            return sum / (values1.Count - 1);
+            return sum / (values1.Length - 1);
         }
 
-        // create a function to calculate the coefficients of a linear regression
-        public double[] Coefficients(List<double> values1, List<double> values2)
+        // create a function to calculate the coefficients of a linear regression (m and b)
+        public double[] Calculate(double[] values1, double[] values2)
         {
             double[] coefficients = new double[2];
-            coefficients[1] = Covariance(values1, values2) / Math.Pow(StandardDeviation(values1), 2);
-            coefficients[0] = Mean(values2) - coefficients[1] * Mean(values1);
+            coefficients[0] = Covariance(values1, values2) / Math.Pow(StandardDeviation(values1), 2);
+            coefficients[1] = Mean(values2) - coefficients[0] * Mean(values1);
             return coefficients;
         }
 
-        // create a function to calculate the predicted values of a linear regression
-        public List<double> Predict(List<double> values1, double[] coefficients)
+        // create function to predict y given and array of coefs (m and b)
+        public static double Predict(double x, double[] coefs)
         {
-            List<double> predictions = new List<double>();
-            foreach (double value in values1)
-            {
-                predictions.Add(coefficients[0] + coefficients[1] * value);
-            }
-            return predictions;
+            // y = mx+b;
+            return coefs[0] * x + coefs[1];
+        }
+
+        // create function to predict y given a series of values and an array of coefs (m and b)
+        public static double[] Predict(double[] values, double[] coefs)
+        {
+            // create array to hold results
+            double[] results = new double[values.Length];
+            // loop through vector and results
+            for (int i = 0; i < values.Length; i++)
+                results[i] = Predict(values[i], coefs);
+            // return the results
+            return results;
         }
 
         // create a function to calculate the root mean squared error of a linear regression
-        public double RMSE(List<double> values1, List<double> values2)
+        public double RMSE(double[] values1, double[] values2)
         {
             double sum = 0;
-            for (int i = 0; i < values1.Count; i++)
+            for (int i = 0; i < values1.Length; i++)
             {
                 double difference = values1[i] - values2[i];
                 sum += Math.Pow(difference, 2);
             }
-            return Math.Sqrt(sum / values1.Count);
+            return Math.Sqrt(sum / values1.Length);
         }
 
         // create a function to calculate the coefficient of determination of a linear regression
-        public double R2(List<double> values1, List<double> values2)
+        public double R2(double[] values1, double[] values2)
         {
             double mean = Mean(values2);
             double sum1 = 0;
             double sum2 = 0;
-            for (int i = 0; i < values1.Count; i++)
+            for (int i = 0; i < values1.Length; i++)
             {
                 sum1 += Math.Pow(values1[i] - values2[i], 2);
                 sum2 += Math.Pow(values2[i] - mean, 2);
@@ -115,24 +144,24 @@ namespace Pub
         }
 
         // create a function to calculate the adjusted coefficient of determination of a linear regression
-        public double AdjustedR2(List<double> values1, List<double> values2, int numberOfPredictors)
+        public double AdjustedR2(double[] values1, double[] values2, int numberOfPredictors)
         {
             double r2 = R2(values1, values2);
-            return 1 - (1 - r2) * (values1.Count - 1) / (values1.Count - numberOfPredictors - 1);
+            return 1 - (1 - r2) * (values1.Length - 1) / (values1.Length - numberOfPredictors - 1);
         }
 
         // create a function to calculate the F-statistic of a linear regression
-        public double FStatistic(List<double> values1, List<double> values2, int numberOfPredictors)
+        public double FStatistic(double[] values1, double[] values2, int numberOfPredictors)
         {
             double r2 = R2(values1, values2);
-            return r2 / (1 - r2) * (values1.Count - numberOfPredictors - 1) / numberOfPredictors;
+            return r2 / (1 - r2) * (values1.Length - numberOfPredictors - 1) / numberOfPredictors;
         }
 
         // create a function to calculate the p-value of a linear regression
-        public double PValue(List<double> values1, List<double> values2, int numberOfPredictors)
+        public double PValue(double[] values1, double[] values2, int numberOfPredictors)
         {
             double f = FStatistic(values1, values2, numberOfPredictors);
-            return 1 - FTest(f, numberOfPredictors, values1.Count - numberOfPredictors - 1);
+            return 1 - FTest(f, numberOfPredictors, values1.Length - numberOfPredictors - 1);
         }
 
         // create a function to calculate the F-test of a linear regression
@@ -166,19 +195,19 @@ namespace Pub
         }
 
         // create a function to calculate the standard error of a linear regression
-        public double StandardError(List<double> values1, List<double> values2)
+        public double StandardError(double[] values1, double[] values2)
         {
             double sum = 0;
-            for (int i = 0; i < values1.Count; i++)
+            for (int i = 0; i < values1.Length; i++)
             {
                 double difference = values1[i] - values2[i];
                 sum += Math.Pow(difference, 2);
             }
-            return Math.Sqrt(sum / (values1.Count - 2));
+            return Math.Sqrt(sum / (values1.Length - 2));
         }
 
         // create a function to calculate the standard error of a coefficient of a linear regression
-        public double StandardError(List<double> values1, List<double> values2, int index)
+        public double StandardError(double[] values1, double[] values2, int index)
         {
             double standardError = StandardError(values1, values2);
             double sum = 0;
@@ -186,7 +215,7 @@ namespace Pub
             {
                 sum += Math.Pow(value, 2);
             }
-            return standardError / Math.Sqrt(sum / (values1.Count - 1));
+            return standardError / Math.Sqrt(sum / (values1.Length - 1));
         }
 
         // create a function to calculate the confidence interval of a coefficient of a linear regression
@@ -201,6 +230,65 @@ namespace Pub
             return interval;
         }
     }
+    
+    // cretae a class to perform multiple linear regression with matricies
+    public class MLR
+    {
+        // create a function to get the beta coefficients of a multiple linear regression by exluding dependant variable column from the input
+        public static double[] Calculate(double[,] x, int depCol)
+        {
+            // create a vector to hold the dependency column
+            double[] y = Matrix.ExtractColumn(x, depCol);
+            // create a matrix with the removed dependency column
+            double[,] X = Matrix.DeleteColumn(x, depCol);
+            // return the calculation
+            return Calculate(X, y);
+        }
+
+        // create a function to get the beta coefficients of a multiple linear regression 
+        public static double[] Calculate(double[,] x, double[] y)
+        {
+            // create a matrix holding only one column containing ones
+            double[,] ones = Matrix.Ones(x.GetLength(0), 1);
+            // insert the ones into the input matrix
+            double[,] X = Matrix.Concatenate(ones, x);
+            // create a matrix to hold the transpose of the X
+            double[,] Xt = Matrix.Transpose(X);
+            // create a matrix to hold the product of the Xt and X
+            double[,] XtX = Matrix.Multiply(Xt, X);
+            // create a matrix to hold the inverse of the XtX
+            double[,] XtXInv = Matrix.Inverse(XtX);
+            // create a matrix to hold the product of the Xt and y
+            double[] Xty = Matrix.Multiply(Xt, y);
+            // create a vector to hold the product of the XtXInv and Xty
+            double[] betas = Matrix.Multiply(XtXInv, Xty);
+            // return the coefficients a.k.a. betas
+            return betas;
+        }
+
+        // create a function to predict yhat from a matrix
+        public static double[] Predict(double[,] x, double[] coeffs)
+        {
+            // create a matrix holding only one column containing ones
+            double[,] ones = Matrix.Ones(x.GetLength(0), 1);
+            // insert the ones into the input matrix
+            double[,] X = Matrix.Concatenate(ones, x);
+            // create a vector to hold the predictions
+            double[] yhat = Matrix.Multiply(X, coeffs);
+            // return the predictions
+            return yhat;
+        }
+
+        // create a function to predict yhat from a vector of independant variables
+        public static double[] Predict(double[] x, double[] coeffs)
+        {
+            // create a matrix from the vector and tranpsoe it
+            double[,] X = Matrix.Transpose(Matrix.FromVector(x));
+            // perform the prediction
+            return Predict(X, coeffs);
+            
+        }
+    }
 
     // create a class to calculate the normal distribution of a linear regression  
     public class NormalDistribution
@@ -210,62 +298,50 @@ namespace Pub
         public static double InverseCumulativeDistribution(double p)
         {
             if (p <= 0 || p >= 1)
-            {
                 throw new ArgumentOutOfRangeException("p", p, "Argument out of range.");
-            }
+
             if (p == 0.5)
-            {
                 return 0;
-            }
+
             if (p < 0.5)
-            {
                 return -InverseCumulativeDistributionCore(2 * p);
-            }
+
             return InverseCumulativeDistributionCore(2 * (1 - p));
         }
 
         // create a function to calculate the inverse cumulative distribution of a normal distribution
         private static double InverseCumulativeDistributionCore(double p)
         {
-            double[] a = new double[] { -3.969683028665376e+01,  2.209460984245205e+02,
-                                                -2.759285104469687e+02,  1.383577518672690e+02,
-                                                -3.066479806614716e+01,  2.506628277459239e+00 };
-            double[] b = new double[] { -5.447609879822406e+01,  1.615858368580409e+02,
-                                                -1.556989798598866e+02,  6.680131188771972e+01,
-                                                -1.328068155288572e+01 };
-            double[] c = new double[] { -7.784894002430293e-03, -3.223964580411365e-01,
-                                                -2.400758277161838e+00, -2.549732539343734e+00,
-                                                4.374664141464968e+00,  2.938163982698783e+00 };
-            double[] d = new double[] {  7.784695709041462e-03,  3.224671290700398e-01,
-                                                2.445134137142996e+00,  3.754408661907416e+00 };
+            double[] a = new double[] { -3.969683028665376e+01,  2.209460984245205e+02, -2.759285104469687e+02,  1.383577518672690e+02, -3.066479806614716e+01,  2.506628277459239e+00 };
+            double[] b = new double[] { -5.447609879822406e+01,  1.615858368580409e+02, -1.556989798598866e+02,  6.680131188771972e+01, -1.328068155288572e+01 };
+            double[] c = new double[] { -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00,  2.938163982698783e+00 };
+            double[] d = new double[] {  7.784695709041462e-03,  3.224671290700398e-01, 2.445134137142996e+00,  3.754408661907416e+00 };
             double q = p - 0.5;
+
             if (Math.Abs(q) <= 0.425)
             {
                 double r = 0.180625 - q * q;
                 return q * (((((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * r + 1)
                 / ((((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1) * r + 1));
             }
+
             double r2 = p;
             if (q > 0)
-            {
                 r2 = 1 - p;
-            }
+
             r2 = Math.Log(-Math.Log(r2));
             double r3 = c[0];
             for (int i = 1; i < 6; i++)
-            {
                 r3 = r3 * r2 + c[i];
-            }
+
             double r4 = d[0];
             for (int i = 1; i < 4; i++)
-            {
                 r4 = r4 * r2 + d[i];
-            }
+
             double r5 = r3 / r4;
             if (q < 0)
-            {
                 r5 = -r5;
-            }
+
             return r5;
         }
     }

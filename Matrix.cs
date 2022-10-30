@@ -34,6 +34,74 @@ namespace Pub
             return c;
         }
 
+        // create a function to delete a column from a matrix
+        public static double[,] DeleteColumn(double[,] a, int column)
+        {
+            // create a matrix to hold the new matrix
+            var b = new double[a.GetLength(0), a.GetLength(1) - 1];
+            // loop through the rows of the matrix
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                // loop through the columns of the matrix
+                for (int j = 0; j < a.GetLength(1); j++)
+                {
+                    // if the column is not the one to be deleted
+                    if (j != column)
+                    {
+                        // set the value of the new matrix
+                        b[i, j < column ? j : j - 1] = a[i, j];
+                    }
+                }
+            }
+            // return the new matrix
+            return b;
+        }
+
+        // create a function to extract a column from a matrix
+        public static double[] ExtractColumn(double[,] a, int column)
+        {
+            // create a vector to hold the column
+            var b = new double[a.GetLength(0)];
+            // loop through the rows of the matrix
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                // set the value of the vector
+                b[i] = a[i, column];
+            }
+            // return the vector
+            return b;
+        }
+
+        // create a function to extract a row from a matrix
+        public static double[] ExtractRow(double[,] a, int row)
+        {
+            // create a vector to hold the row
+            var b = new double[a.GetLength(1)];
+            // loop through the columns of the matrix
+            for (int i = 0; i < a.GetLength(1); i++)
+            {
+                // set the value of the vector
+                b[i] = a[row, i];
+            }
+            // return the vector
+            return b;
+        }
+
+        // create a function to create a matrix from a vector
+        public static double[,] FromVector(double[] a)
+        {
+            // create a matrix to hold the vector
+            var b = new double[a.GetLength(0), 1];
+            // loop through the vector
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                // set the value of the matrix
+                b[i, 0] = a[i];
+            }
+            // return the matrix
+            return b;
+        }
+
         // create a method to multiply two matrices
         public static double[,] Multiply(double[,] a, double[,] b)
         {
