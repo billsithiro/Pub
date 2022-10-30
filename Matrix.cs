@@ -1,17 +1,39 @@
-// add common namespaces
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using System.Diagnostics;
 
 namespace Pub
 {
     // create a class to perform matrix operations
     public class Matrix
-    {        
+    {
+        // create a method to concatenate two matricies
+        public static double[,] Concatenate(double[,] a, double[,] b)
+        {
+            // create a matrix to hold the concatenated matrix
+            var c = new double[a.GetLength(0), a.GetLength(1) + b.GetLength(1)];
+            // loop through the rows of the first matrix
+            for (int i = 0; i < a.GetLength(0); i++)
+            {
+                // loop through the columns of the first matrix
+                for (int j = 0; j < a.GetLength(1); j++)
+                {
+                    // set the value of the concatenated matrix
+                    c[i, j] = a[i, j];
+                }
+            }
+            // loop through the rows of the second matrix
+            for (int i = 0; i < b.GetLength(0); i++)
+            {
+                // loop through the columns of the second matrix
+                for (int j = 0; j < b.GetLength(1); j++)
+                {
+                    // set the value of the concatenated matrix
+                    c[i, j + a.GetLength(1)] = b[i, j];
+                }
+            }
+            // return the concatenated matrix
+            return c;
+        }
+
         // create a method to multiply two matrices
         public static double[,] Multiply(double[,] a, double[,] b)
         {
@@ -129,7 +151,6 @@ namespace Pub
         // create a method to add two matrices
         public static double[,] Add(double[,] a, double[,] b)
         {
-
             // get the number of rows in the first matrix
             int aRows = a.GetLength(0);
             // get the number of columns in the first matrix
@@ -171,7 +192,7 @@ namespace Pub
             return result;
         }
 
-        // create a method to multiply a 6 by 4 matrix by a 6 element array
+        // create a method to multiply a matrix by an array
         public static double[] Multiply(double[,] a, double[] b)
         {
 
