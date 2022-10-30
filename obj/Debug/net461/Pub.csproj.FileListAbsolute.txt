@@ -1,9 +1,0 @@
-C:\Pub\bin\Debug\net461\Pub.exe.config
-C:\Pub\bin\Debug\net461\Pub.exe
-C:\Pub\bin\Debug\net461\Pub.pdb
-C:\Pub\obj\Debug\net461\Pub.csprojAssemblyReference.cache
-C:\Pub\obj\Debug\net461\Pub.csproj.CoreCompileInputs.cache
-C:\Pub\obj\Debug\net461\Pub.AssemblyInfoInputs.cache
-C:\Pub\obj\Debug\net461\Pub.AssemblyInfo.cs
-C:\Pub\obj\Debug\net461\Pub.exe
-C:\Pub\obj\Debug\net461\Pub.pdb
