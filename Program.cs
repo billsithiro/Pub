@@ -31,8 +31,8 @@ namespace Pub
                     { 4100, 6, 8  }
             }, prices);            
 
-            var result = MLR.Predict(new double[,] { { 3000, 3, 40 } }, coefs2);
-            Console.WriteLine(result[0]);
+            var result = MLR.Predict(new double[,] { { 3000, 3, 40 }, { 2500, 4, 5 } }, coefs2); // 498408.25158031, 578876.03748933            
+            Console.WriteLine(string.Join(" ", result));
             
             var coefs3 = MLR.Calculate(new double[,] {
                     { 0,   8,   9,   50000 },
@@ -46,6 +46,7 @@ namespace Pub
             }, 3);            
             Console.WriteLine(string.Join(" ", MLR.Predict(new double[,] { { 2, 9, 6 }, { 12, 10, 10 } }, coefs3)));
             Console.WriteLine(MLR.Predict(new double[] { 12, 10, 10 }, coefs3));
+            // Answer 53713.86 and 93747.79
 
         }
     }
