@@ -1,4 +1,15 @@
-// class to perform multiple linear regression with matricies
+// add common namespaces
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.IO;
+using System.Diagnostics;
+
+namespace Pub
+{
+    // class to perform multiple linear regression with matricies
     public class MLR
     {      
         // create a function to perform multiple linear regression
@@ -22,8 +33,9 @@
         public static double[] Predict(double[,] x, double[] coefficients)
         {            
             // create a matrix to hold the predictions
-            var yHat = Matrix.Multiply(x, coefficients);
+            var yhat = Matrix.Multiply(x, coefficients);
             // return the values of the matrix
-            return yHat;
+            return yhat;
         }
     }
+}
