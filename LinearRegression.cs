@@ -54,7 +54,7 @@ namespace Pub
     public class SSLR
     {
         // create a function to calculate the mean of a list of numbers
-        public double Mean(double[] values)
+        public static double Mean(double[] values)
         {
             double sum = 0;
             foreach (double value in values)
@@ -65,7 +65,7 @@ namespace Pub
         }
 
         // create a function to calculate the standard deviation of a list of numbers
-        public double StandardDeviation(double[] values)
+        public static double StandardDeviation(double[] values)
         {
             double mean = Mean(values);
             double sum = 0;
@@ -77,7 +77,7 @@ namespace Pub
         }
 
         // create a function to calculate the covariance between two lists of numbers
-        public double Covariance(double[] values1, double[] values2)
+        public static double Covariance(double[] values1, double[] values2)
         {
             double mean1 = Mean(values1);
             double mean2 = Mean(values2);
@@ -90,7 +90,7 @@ namespace Pub
         }
 
         // create a function to calculate the coefficients of a linear regression (m and b)
-        public double[] Calculate(double[] values1, double[] values2)
+        public static double[] Calculate(double[] values1, double[] values2)
         {
             double[] coefficients = new double[2];
             coefficients[0] = Covariance(values1, values2) / Math.Pow(StandardDeviation(values1), 2);
@@ -118,7 +118,7 @@ namespace Pub
         }
 
         // create a function to calculate the root mean squared error of a linear regression
-        public double RMSE(double[] values1, double[] values2)
+        public static double RMSE(double[] values1, double[] values2)
         {
             double sum = 0;
             for (int i = 0; i < values1.Length; i++)
@@ -130,7 +130,7 @@ namespace Pub
         }
 
         // create a function to calculate the coefficient of determination of a linear regression
-        public double R2(double[] values1, double[] values2)
+        public static double R2(double[] values1, double[] values2)
         {
             double mean = Mean(values2);
             double sum1 = 0;
@@ -144,28 +144,28 @@ namespace Pub
         }
 
         // create a function to calculate the adjusted coefficient of determination of a linear regression
-        public double AdjustedR2(double[] values1, double[] values2, int numberOfPredictors)
+        public static double AdjustedR2(double[] values1, double[] values2, int numberOfPredictors)
         {
             double r2 = R2(values1, values2);
             return 1 - (1 - r2) * (values1.Length - 1) / (values1.Length - numberOfPredictors - 1);
         }
 
         // create a function to calculate the F-statistic of a linear regression
-        public double FStatistic(double[] values1, double[] values2, int numberOfPredictors)
+        public static double FStatistic(double[] values1, double[] values2, int numberOfPredictors)
         {
             double r2 = R2(values1, values2);
             return r2 / (1 - r2) * (values1.Length - numberOfPredictors - 1) / numberOfPredictors;
         }
 
         // create a function to calculate the p-value of a linear regression
-        public double PValue(double[] values1, double[] values2, int numberOfPredictors)
+        public static double PValue(double[] values1, double[] values2, int numberOfPredictors)
         {
             double f = FStatistic(values1, values2, numberOfPredictors);
             return 1 - FTest(f, numberOfPredictors, values1.Length - numberOfPredictors - 1);
         }
 
         // create a function to calculate the F-test of a linear regression
-        public double FTest(double f, int df1, int df2)
+        public static double FTest(double f, int df1, int df2)
         {
             double p = 0;
             double x = df2 / (df2 + df1 * f);
@@ -177,13 +177,13 @@ namespace Pub
         }
 
         // create a function to calculate the t-statistic of a linear regression
-        public double TStatistic(double coefficient, double standardError)
+        public static double TStatistic(double coefficient, double standardError)
         {
             return coefficient / standardError;
         }
 
         // create a function to calculate the p-value of a linear regression
-        public double PValue(double t, int df)
+        public static double PValue(double t, int df)
         {
             double p = 0;
             double x = df / (df + t * t);
@@ -195,7 +195,7 @@ namespace Pub
         }
 
         // create a function to calculate the standard error of a linear regression
-        public double StandardError(double[] values1, double[] values2)
+        public static double StandardError(double[] values1, double[] values2)
         {
             double sum = 0;
             for (int i = 0; i < values1.Length; i++)
@@ -207,7 +207,7 @@ namespace Pub
         }
 
         // create a function to calculate the standard error of a coefficient of a linear regression
-        public double StandardError(double[] values1, double[] values2, int index)
+        public static double StandardError(double[] values1, double[] values2, int index)
         {
             double standardError = StandardError(values1, values2);
             double sum = 0;
@@ -219,7 +219,7 @@ namespace Pub
         }
 
         // create a function to calculate the confidence interval of a coefficient of a linear regression
-        public double[] ConfidenceInterval(double coefficient, double standardError, double alpha)
+        public static double[] ConfidenceInterval(double coefficient, double standardError, double alpha)
         {
             double[] interval = new double[2];
             //double t = TStatistic(coefficient, standardError);
