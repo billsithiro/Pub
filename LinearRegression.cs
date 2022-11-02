@@ -9,6 +9,121 @@ using System.Diagnostics;
 
 namespace Pub
 {
+    // create a class to perform time series forecasting
+    public class TSLR
+    {
+        // create a field to hold the seasonality averages
+        public readonly double[] StAvg;
+        // create a field to hold the seasonal component
+        public readonly double[] St;
+        // create a field to hold the iregularotary component
+        public readonly double[] It;
+        // create a field to hold the trend line component
+        public readonly double[] Tt;
+        // create a field to hold the time units
+        public readonly double[] Tu;
+        // create a field to hold the coefficients of the simple linear regression
+        public readonly double[] Coefs;
+        // create a field to hold the predictions of the inputed series
+        public readonly double[] Predicted;        
+        // create a field to hold the length of data
+        public readonly int Length;
+        // create a field to hold the seasonality of the time series
+        public readonly int Seasonality;
+
+        // create a function to calculate a moving average with given window
+        public static double[] MA(double[] values, int window)
+        {
+            var result = new double[values.Length];
+            for (int i = 0; i < values.Length; i++)
+            {
+                var start = Math.Max(0, i - window + 1);
+                var count = Math.Min(window, i + 1);
+                var sum = 0.0;
+                for (int j = start; j < start + count; j++)
+                {
+                    sum += values[j];
+                }
+                result[i] = sum / count;
+            }
+            return result;
+        }
+
+        // create a function to calculate time series data and return components to be used in forecasting
+        public TSLR(double[] data, int seasonality = 7)
+        {           
+            // set the length of our data
+            Length = data.Length;
+
+            // set the seasonality of our time series
+            Seasonality = seasonality;
+
+            // smooth out data by performing a moving average
+            double[] ma = MA(data, seasonality);
+            // perform a centered moving average if the data is even
+            double[] cma = MA(ma, seasonality);
+
+            // we will be using the classic time series multiplicative model to forecast future values
+            // Yt = St*It*Tt
+
+            // derived seasonality and irregularity combined component (StIt)
+            IEnumerable<double> stit = data.Select((a, i) => a / cma[i]);
+
+            // we will need to remove the irregularity so as we are left only with the St component
+            // to achieve this we will use a table that contains the average of each seasonality value
+            StAvg = new double[seasonality];
+            double[] counter = new double[seasonality];
+            for (int i = 0; i < Length; i++)
+            {
+                int idx = i % seasonality;
+                StAvg[idx] += data[idx] / cma[idx];
+                counter[idx]++;
+            }
+            StAvg = StAvg.Select((a, i) => a / counter[i]).ToArray();
+
+            // set the St and It (deseasonalized) components
+            St = new double[Length];
+            It = new double[Length];
+            for (int i = 0; i < Length; i++)
+            {
+                int idx = i % seasonality;
+                St[i] = StAvg[idx];
+                It[i] = data[i] / St[i];
+            }
+
+            // set the trend line Tt component by performing a simple linear regression  
+            // x will be the time units and y will be the It component
+            Tu = Enumerable.Range(1, Length).Select(a => (double)a).ToArray();
+            Coefs = SLR.Calculate(Tu, It);
+            Tt = SLR.Predict(Tu, Coefs);
+
+            // forecast the input data for testing the quality of the calulations
+            Predicted = Tt.Select((a, i) => a * St[i]).ToArray();            
+        }
+
+        // create a function to perform a series of forecasts into the future
+        public double[] Forecast(int steps)
+        {
+            // set the starting point of the forecast
+            int start = (int)Tu.Last() + 1;
+            // hold the results
+            double[] results = new double[steps];
+            // counter to helps us index the results
+            int cnt = 0;
+            // loop through steps and perform a forecast
+            for (int i = start; i < start + steps; i++)
+            {
+                int idx = i % Seasonality;
+                double st = StAvg[idx];
+                double tt = Coefs[0] * i + Coefs[1];
+                results[cnt++] = st * tt;
+            }
+            // return the results
+            return results;
+        }
+
+    }
+
     // create a class to perform simple linear regression calculations
     public class SLR
     {
