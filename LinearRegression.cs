@@ -50,7 +50,7 @@ namespace Pub
         }
 
         // create a function to calculate time series data and return components to be used in forecasting
-        public TSLR(double[] data, int seasonality = 7)
+        public TSLR(double[] data, int seasonality = 30)
         {           
             // set the length of our data
             Length = data.Length;
@@ -79,7 +79,7 @@ namespace Pub
                 StAvg[idx] += data[idx] / cma[idx];
                 counter[idx]++;
             }
-            StAvg = StAvg.Select((a, i) => a / counter[i]).ToArray();
+            StAvg = StAvg.Where(a => a != 0).Select((a, i) => a / counter[i]).ToArray();
 
             // set the St and It (deseasonalized) components
             St = new double[Length];
@@ -106,6 +106,8 @@ namespace Pub
         {
             // set the starting point of the forecast
             int start = (int)Tu.Last() + 1;
+            if (start > Length)
+                start = 0;
             // hold the results
             double[] results = new double[steps];
             // counter to helps us index the results
