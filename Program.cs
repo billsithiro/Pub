@@ -6,6 +6,9 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
+using System.Data;
+using Microsoft.CodeAnalysis.CSharp.Scripting;
+using Microsoft.CodeAnalysis.Scripting;
 
 namespace Pub
 {
@@ -13,6 +16,8 @@ namespace Pub
     {
         static void Main(string[] args)
         {
+            //var eval = CSharpScript.EvaluateAsync("1 + 3 * 12 + System.DateTime.Now.Ticks").Result;
+
             var tu = new double[] { 15584,  15585,  15586, 15587, 15588, 15589, 15590, 15591, 15592, 15593, 15594,  15595, 15596, 15597, 15598, 15599,  15600,  15601,  15602, 15603, 15604, 15605, 15606, 15607, 15608, 15609, 15610, 15611, 15612,  15613 };
             //var tu = Enumerable.Range(1, 16).Select(a => (double)a).ToArray();
             //var days = new double[] { 5,      6,      7,     1,     2,     3,     4,     5,     6,     7,     1,      2,     3,     4,     5,     6,      7,      1,      2,     3,     4,     5,     6,     7,     1,     2,     3,     4,     5,      6     };

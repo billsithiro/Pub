@@ -43,47 +43,8 @@ namespace Pub
                 result[i] = sum / count;
             }
             return result;
-        }
-
-        // create a function to convert an infix expression to postfix
-        public static string InfixToPostfix(string infix)
-        {
-            var stack = new Stack<char>();
-            var postfix = new StringBuilder();
-            foreach (var c in infix)
-            {
-                if (c == '(')
-                {
-                    stack.Push(c);
-                }
-                else if (c == ')')
-                {
-                    while (stack.Count > 0 && stack.Peek() != '(')
-                    {
-                        postfix.Append(stack.Pop());
-                    }
-                    stack.Pop();
-                }
-                else if (c == '+' || c == '-' || c == '*' || c == '/')
-                {
-                    while (stack.Count > 0 && stack.Peek() != '(' && stack.Peek() != '+' && stack.Peek() != '-')
-                    {
-                        postfix.Append(stack.Pop());
-                    }
-                    stack.Push(c);
-                }
-                else
-                {
-                    postfix.Append(c);
-                }
-            }
-            while (stack.Count > 0)
-            {
-                postfix.Append(stack.Pop());
-            }
-            return postfix.ToString();
-        }
-    }
+        }        
+    }        
 
     // create class to perform classic multiplicative time series
     public class TimeSeries
