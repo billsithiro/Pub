@@ -10,6 +10,39 @@ namespace Pub
 {
     public static class Utilities2    
     {
+// create a function to perform a fast fourier transform
+        public static double[] FFT(double[] values)
+        {
+            var result = new double[values.Length];
+            for (int i = 0; i < values.Length; i++)
+            {
+                var sum = 0.0;
+                for (int j = 0; j < values.Length; j++)
+                {
+                    var angle = 2 * Math.PI * i * j / values.Length;
+                    sum += values[j] * Math.Cos(angle);
+                }
+                result[i] = sum;
+            }
+            return result;
+        }   
+
+// create a function to perform a fast fourier transform and return the seasonality
+        public static int FFTSeasonality(double[] values)
+        {
+            var fft = FFT(values);
+            var max = fft.Max();
+            for (int i = 0; i < fft.Length; i++)
+            {
+                if (fft[i] == max)
+                {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        
         public static string InfixToPostfix(string expression)
         {
             int Precedence(char c)
