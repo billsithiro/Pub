@@ -485,8 +485,6 @@ namespace MachineLearning
             int features = x.GetLength(1) - 1;
             double[] y = Matrix.ExtractColumn(x, x.GetLength(1) - 1);
             double[] weights = new double[features + 1];
-            if (costs != null)
-                costs = new double[iterations];
 
             for (int i = 0; i < iterations; i++)
             {
