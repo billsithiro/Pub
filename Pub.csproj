@@ -14,4 +14,10 @@
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp.Scripting" Version="4.3.1" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="dataset1.csv">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

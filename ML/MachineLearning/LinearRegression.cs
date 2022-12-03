@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Diagnostics;
 
-namespace Pub
-{
+namespace MachineLearning
+{    
     // create a class to perform time series forecasting
     public class TSLR
     {
@@ -50,18 +50,18 @@ namespace Pub
         }
 
         // create a function to calculate time series data and return components to be used in forecasting
-        public TSLR(double[] data, int seasonality = 30)
+        public TSLR(double[] data, int seasonality = -1)
         {           
             // set the length of our data
             Length = data.Length;
 
             // set the seasonality of our time series
-            Seasonality = seasonality;
+            Seasonality = seasonality == -1 ? (int)Math.Round(Utilities.FFT(data).Max()) : seasonality;
 
             // smooth out data by performing a moving average
-            double[] ma = MA(data, seasonality);
+            double[] ma = MA(data, Seasonality);
             // perform a centered moving average if the data is even
-            double[] cma = MA(ma, seasonality);
+            double[] cma = MA(ma, Seasonality);
 
             // we will be using the classic time series multiplicative model to forecast future values
             // Yt = St*It*Tt
@@ -71,11 +71,11 @@ namespace Pub
 
             // we will need to remove the irregularity so as we are left only with the St component
             // to achieve this we will use a table that contains the average of each seasonality value
-            StAvg = new double[seasonality];
-            double[] counter = new double[seasonality];
+            StAvg = new double[Seasonality];
+            double[] counter = new double[Seasonality];
             for (int i = 0; i < Length; i++)
             {
-                int idx = i % seasonality;
+                int idx = i % Seasonality;
                 StAvg[idx] += data[idx] / cma[idx];
                 counter[idx]++;
             }
@@ -86,7 +86,7 @@ namespace Pub
             It = new double[Length];
             for (int i = 0; i < Length; i++)
             {
-                int idx = i % seasonality;
+                int idx = i % Seasonality;
                 St[i] = StAvg[idx];
                 It[i] = data[i] / St[i];
             }
@@ -94,7 +94,7 @@ namespace Pub
             // set the trend line Tt component by performing a simple linear regression  
             // x will be the time units and y will be the It component
             Tu = Enumerable.Range(1, Length).Select(a => (double)a).ToArray();
-            Coefs = SLR.Calculate(Tu, It);
+            Coefs = SLR.Fit(Tu, It);
             Tt = SLR.Predict(Tu, Coefs);
 
             // forecast the input data for testing the quality of the calulations
@@ -130,7 +130,7 @@ namespace Pub
     public class SLR
     {
         // create a function to calculate the coefs of a linear regression (m and b)
-        public static double[] Calculate(double[] x, double[] y)
+        public static double[] Fit(double[] x, double[] y)
         {
             double[] result = new double[2];
             double xSum = x.Sum();
@@ -218,7 +218,7 @@ namespace Pub
         }
 
         // create a function to calculate the coefficients of a linear regression (m and b)
-        public static double[] Calculate(double[] values1, double[] values2)
+        public static double[] Fit(double[] values1, double[] values2)
         {
             double[] coefficients = new double[2];
             coefficients[0] = Covariance(values1, values2) / Math.Pow(StandardDeviation(values1), 2);
@@ -357,24 +357,83 @@ namespace Pub
             interval[1] = coefficient + z * standardError;
             return interval;
         }
+
+        // create a class to calculate the normal distribution of a linear regression  
+        private class NormalDistribution
+        {
+
+            // create a function to calculate the inverse cumulative distribution of a normal distribution
+            public static double InverseCumulativeDistribution(double p)
+            {
+                if (p <= 0 || p >= 1)
+                    throw new ArgumentOutOfRangeException("p", p, "Argument out of range.");
+
+                if (p == 0.5)
+                    return 0;
+
+                if (p < 0.5)
+                    return -InverseCumulativeDistributionCore(2 * p);
+
+                return InverseCumulativeDistributionCore(2 * (1 - p));
+            }
+
+            // create a function to calculate the inverse cumulative distribution of a normal distribution
+            private static double InverseCumulativeDistributionCore(double p)
+            {
+                double[] a = new double[] { -3.969683028665376e+01, 2.209460984245205e+02, -2.759285104469687e+02, 1.383577518672690e+02, -3.066479806614716e+01, 2.506628277459239e+00 };
+                double[] b = new double[] { -5.447609879822406e+01, 1.615858368580409e+02, -1.556989798598866e+02, 6.680131188771972e+01, -1.328068155288572e+01 };
+                double[] c = new double[] { -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00, 2.938163982698783e+00 };
+                double[] d = new double[] { 7.784695709041462e-03, 3.224671290700398e-01, 2.445134137142996e+00, 3.754408661907416e+00 };
+                double q = p - 0.5;
+
+                if (Math.Abs(q) <= 0.425)
+                {
+                    double r = 0.180625 - q * q;
+                    return q * (((((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * r + 1)
+                    / ((((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1) * r + 1));
+                }
+
+                double r2 = p;
+                if (q > 0)
+                    r2 = 1 - p;
+
+                r2 = Math.Log(-Math.Log(r2));
+                double r3 = c[0];
+                for (int i = 1; i < 6; i++)
+                    r3 = r3 * r2 + c[i];
+
+                double r4 = d[0];
+                for (int i = 1; i < 4; i++)
+                    r4 = r4 * r2 + d[i];
+
+                double r5 = r3 / r4;
+                if (q < 0)
+                    r5 = -r5;
+
+                return r5;
+            }
+        }
     }
     
     // cretae a class to perform multiple linear regression with matricies
     public class MLR
     {
         // create a function to get the beta coefficients of a multiple linear regression by exluding dependant variable column from the input
-        public static double[] Calculate(double[,] x, int depCol)
+        public static double[] Fit(double[,] x, int depCol = -1)
         {
+            if (depCol == -1)
+                depCol = x.GetLength(1) - 1;
+
             // create a vector to hold the dependency column
             double[] y = Matrix.ExtractColumn(x, depCol);
             // create a matrix with the removed dependency column
             double[,] X = Matrix.DeleteColumn(x, depCol);
             // return the calculation
-            return Calculate(X, y);
+            return Fit(X, y);
         }
 
         // create a function to get the beta coefficients of a multiple linear regression 
-        public static double[] Calculate(double[,] x, double[] y)
+        public static double[] Fit(double[,] x, double[] y)
         {
             // create a matrix holding only one column containing ones
             double[,] ones = Matrix.Ones(x.GetLength(0), 1);
@@ -417,60 +476,82 @@ namespace Pub
         }
     }
 
-    // create a class to calculate the normal distribution of a linear regression  
-    public class NormalDistribution
-    {
-
-        // create a function to calculate the inverse cumulative distribution of a normal distribution
-        public static double InverseCumulativeDistribution(double p)
+    // create a class to perform a logistic regression
+    public class LBR
+    {                
+        public static double[] Fit(double[,] x, double learningRate = 0.01, int iterations = 1000, double[] costs = null)
         {
-            if (p <= 0 || p >= 1)
-                throw new ArgumentOutOfRangeException("p", p, "Argument out of range.");
+            int samples = x.GetLength(0);
+            int features = x.GetLength(1) - 1;
+            double[] y = Matrix.ExtractColumn(x, x.GetLength(1) - 1);
+            double[] weights = new double[features + 1];
+            if (costs != null)
+                costs = new double[iterations];
 
-            if (p == 0.5)
-                return 0;
-
-            if (p < 0.5)
-                return -InverseCumulativeDistributionCore(2 * p);
-
-            return InverseCumulativeDistributionCore(2 * (1 - p));
-        }
-
-        // create a function to calculate the inverse cumulative distribution of a normal distribution
-        private static double InverseCumulativeDistributionCore(double p)
-        {
-            double[] a = new double[] { -3.969683028665376e+01,  2.209460984245205e+02, -2.759285104469687e+02,  1.383577518672690e+02, -3.066479806614716e+01,  2.506628277459239e+00 };
-            double[] b = new double[] { -5.447609879822406e+01,  1.615858368580409e+02, -1.556989798598866e+02,  6.680131188771972e+01, -1.328068155288572e+01 };
-            double[] c = new double[] { -7.784894002430293e-03, -3.223964580411365e-01, -2.400758277161838e+00, -2.549732539343734e+00, 4.374664141464968e+00,  2.938163982698783e+00 };
-            double[] d = new double[] {  7.784695709041462e-03,  3.224671290700398e-01, 2.445134137142996e+00,  3.754408661907416e+00 };
-            double q = p - 0.5;
-
-            if (Math.Abs(q) <= 0.425)
+            for (int i = 0; i < iterations; i++)
             {
-                double r = 0.180625 - q * q;
-                return q * (((((((a[0] * r + a[1]) * r + a[2]) * r + a[3]) * r + a[4]) * r + a[5]) * r + 1)
-                / ((((((b[0] * r + b[1]) * r + b[2]) * r + b[3]) * r + b[4]) * r + 1) * r + 1));
+                double[] yPred = Predict(x, weights);
+                if (costs != null)
+                    costs[i] = Cost(y, yPred);
+                var dw = new double[features];
+                var db = 0.0;
+                for (int j = 0; j < samples; j++)
+                {
+                    for (int k = 0; k < features; k++)
+                    {
+                        dw[k] += (yPred[j] - y[j]) * x[j, k];
+                    }
+                    db += (yPred[j] - y[j]);
+                }
+                for (int j = 0; j < features; j++)
+                {
+                    weights[j + 1] -= learningRate * dw[j] / samples;
+                }
+                weights[0] -= learningRate * db / samples; // Bias (stored in indicy 0)
             }
 
-            double r2 = p;
-            if (q > 0)
-                r2 = 1 - p;
+            return weights;
+        }
 
-            r2 = Math.Log(-Math.Log(r2));
-            double r3 = c[0];
-            for (int i = 1; i < 6; i++)
-                r3 = r3 * r2 + c[i];
+        public static double[] Predict(double[,] x, double[] weights)
+        {
+            int samples = x.GetLength(0);
+            double[] yPred = new double[samples];
+            for (int i = 0; i < samples; i++)
+            {
+                double z = 0.0;
+                for (int j = 0; j < weights.Length - 1; j++)
+                {
+                    z += weights[j + 1] * x[i, j];
+                }
+                z += weights[0]; // Bias (stored in indicy 0)
+                yPred[i] = Sigmoid(z);
+            }
+            return yPred;
+        }
 
-            double r4 = d[0];
-            for (int i = 1; i < 4; i++)
-                r4 = r4 * r2 + d[i];
+        public static double Predict(double[] x, double[] weights)
+        {            
+            double[,] X = Matrix.Transpose(Matrix.FromVector(x));
+            return Predict(X, weights)[0];
+        }
 
-            double r5 = r3 / r4;
-            if (q < 0)
-                r5 = -r5;
+        public static double Cost(double[] y, double[] yPred)
+        {
+            int samples = y.Length;
+            double cost = 0.0;
+            for (int i = 0; i < samples; i++)
+            {
+                cost += y[i] * Math.Log(yPred[i]) + (1 - y[i]) * Math.Log(1 - yPred[i]);
+            }
+            return -cost / samples;
+        }
 
-            return r5;
+        public static double Sigmoid(double x)
+        {
+            return 1 / (1 + Math.Exp(-x));
         }
     }
+
 }
 

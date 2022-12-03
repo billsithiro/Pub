@@ -1,0 +1,7 @@
+C:\Pub\ML\MachineLearning\bin\Debug\MachineLearning.exe.config
+C:\Pub\ML\MachineLearning\bin\Debug\MachineLearning.exe
+C:\Pub\ML\MachineLearning\bin\Debug\MachineLearning.pdb
+C:\Pub\ML\MachineLearning\obj\Debug\MachineLearning.csprojAssemblyReference.cache
+C:\Pub\ML\MachineLearning\obj\Debug\MachineLearning.csproj.CoreCompileInputs.cache
+C:\Pub\ML\MachineLearning\obj\Debug\MachineLearning.exe
+C:\Pub\ML\MachineLearning\obj\Debug\MachineLearning.pdb
