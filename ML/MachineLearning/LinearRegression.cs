@@ -611,6 +611,28 @@ namespace MachineLearning
             return yPred;
         }
 
+        public static double[] Predict(double[,] x, double[,] weights)
+        {
+            int samples = x.GetLength(0);
+            int numClasses = weights.GetLength(1);
+            double[] yPred = new double[samples];
+
+            for (int i = 0; i < samples; i++)
+            {
+                double[] z = new double[numClasses];
+                for (int j = 0; j < numClasses; j++)
+                {
+                    for (int k = 0; k < x.GetLength(1); k++)
+                    {
+                        z[j] += weights[k, j] * x[i, k];
+                    }
+                }
+                yPred[i] = Softmax(z)[0];
+            }
+
+            return yPred;
+        }
+
         public static double Cost(double[,] y, double[,] yPred)
         {
             int samples = y.GetLength(0);
