@@ -652,6 +652,26 @@ namespace MachineLearning
         {
             return 1 / (1 + Math.Exp(-x));
         }
+
+        public static double[] Softmax(double[] z)
+        {
+            double[] expZ = new double[z.Length];
+            double sumExpZ = 0.0;
+
+            for (int i = 0; i < z.Length; i++)
+            {
+                expZ[i] = Math.Exp(z[i]);
+                sumExpZ += expZ[i];
+            }
+
+            double[] softmax = new double[z.Length];
+            for (int i = 0; i < z.Length; i++)
+            {
+                softmax[i] = expZ[i] / sumExpZ;
+            }
+
+            return softmax;
+        }
     }
 
 }
