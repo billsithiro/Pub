@@ -553,19 +553,25 @@ namespace MachineLearning
 
     public static class MLRC
     {
-        public static double[,] Fit(double[,] x, int numClasses, double learningRate = 0.01, int iterations = 1000, double[,] costs = null)
-        {
+        public static double[,] Fit(double[,] x, int numClasses = 1, double learningRate = 0.01, int iterations = 1000, double[,] costs = null)
+        {            
             int samples = x.GetLength(0);
             int features = x.GetLength(1) - numClasses;
-            double[,] y = Matrix.ExtractColumns(x, features, numClasses);
+            double[,] y = Matrix.ExtractColumns(x, Enumerable.Range(features, numClasses).ToArray());
             double[,] weights = new double[features + 1, numClasses];
+
+            Random rnd = new Random(0);
+            double lo = -0.01; double hi = 0.01;
+            for (int i = 0; i < weights.GetLength(0); ++i)
+                for (int j = 0; j < weights.GetLength(1); ++j)
+                    weights[i, j] = (hi - lo) * rnd.NextDouble() + lo;
 
             for (int i = 0; i < iterations; i++)
             {
                 double[,] yPred = Predict(x, weights);
                 if (costs != null)
                     costs[i, 0] = Cost(y, yPred);
-                double[,] dW = new double[features + 1, numClasses];
+                double[,] dw = new double[features + 1, numClasses + 1];
                 double db = 0.0;
                 for (int j = 0; j < samples; j++)
                 {
@@ -573,19 +579,20 @@ namespace MachineLearning
                     {
                         for (int l = 0; l < features + 1; l++)
                         {
-                            dW[l, k] += (yPred[j, k] - y[j, k]) * x[j, l];
+                            dw[l, k] += (yPred[j, k] - y[j, k]) * x[j, l];
                         }
                         db += (yPred[j, k] - y[j, k]);
                     }
                 }
-                weights[0, 0] -= learningRate * db / samples; // Bias (stored in index 0)
+                
                 for (int j = 0; j < numClasses; j++)
                 {
-                    for (int k = 0; k < features + 1; k++)
+                    for (int k = 0; k < features; k++)
                     {
-                        weights[k, j] -= learningRate * dW[k, j] / samples;
+                        weights[k + 1, j] -= learningRate * dw[k, j] / samples;
                     }
                 }
+                weights[0, 0] -= learningRate * db / samples; // Bias (stored in index 0)
             }
 
             return weights;
@@ -596,38 +603,22 @@ namespace MachineLearning
             int samples = x.GetLength(0);
             int numClasses = weights.GetLength(1);
             double[,] yPred = new double[samples, numClasses];
-            for (int i = 0; i < samples; i++)
-            {
-                for (int j = 0; j < numClasses; j++)
-                {
-                    double z = weights[0, j]; // Bias (stored in index 0)
-                    for (int k = 0; k < x.GetLength(1) - 1; k++)
-                    {
-                        z += weights[k + 1, j] * x[i, k];
-                    }
-                    yPred[i, j] = Sigmoid(z);
-                }
-            }
-            return yPred;
-        }
-
-        public static double[] Predict(double[,] x, double[,] weights)
-        {
-            int samples = x.GetLength(0);
-            int numClasses = weights.GetLength(1);
-            double[] yPred = new double[samples];
 
             for (int i = 0; i < samples; i++)
             {
                 double[] z = new double[numClasses];
                 for (int j = 0; j < numClasses; j++)
                 {
-                    for (int k = 0; k < x.GetLength(1); k++)
+                    for (int k = 0; k < weights.GetLength(1); k++)
                     {
-                        z[j] += weights[k, j] * x[i, k];
+                        z[j] += weights[k + 1, j] * x[i, k];
                     }
+                    z[j] += weights[0, 0]; // bias stored in indicy 0                    
                 }
-                yPred[i] = Softmax(z)[0];
+
+                double[] softMax = Softmax(z);
+                for (int j = 0; j < numClasses; j++)
+                    yPred[i, j] = softMax[j];
             }
 
             return yPred;
@@ -646,12 +637,7 @@ namespace MachineLearning
                 }
             }
             return -cost / samples;
-        }
-
-        public static double Sigmoid(double x)
-        {
-            return 1 / (1 + Math.Exp(-x));
-        }
+        }        
 
         public static double[] Softmax(double[] z)
         {
@@ -671,7 +657,7 @@ namespace MachineLearning
             }
 
             return softmax;
-        }
+        }       
     }
 
 }

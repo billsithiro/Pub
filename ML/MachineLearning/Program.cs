@@ -326,20 +326,19 @@ namespace MachineLearning
 
         static void LogisticRegression()
         {            
-            double[] coefs = LBR.Fit(new double[,] {
-                    { 0,   8,   9,   0 },
-                    { 0,   8,   6,   0 },
-                    { 5,   6,   7,   0 },
-                    { 2,   10,  10,  0 },
-                    { 7,   9,   6,   1 },
-                    { 3,   7,   10,  0 },
-                    { 10,  7,   7,   1 },
-                    { 11,  7,   8,   1 }
-            });            
-            
-            Console.WriteLine(string.Join(",", LBR.Predict(new double[,] { { 0, 8, 9 }, { 11, 7, 8 } }, coefs)));
-            Console.WriteLine(LBR.Predict(new double[] { 7, 9, 6 }, coefs));
+            double[,] weights = MLRC.Fit(new double[,] {
+                    { 0,   8,   9,   1,  0,  0 },
+                    { 0,   8,   6,   1,  0,  0 },
+                    { 5,   6,   7,   1,  0,  0 },
+                    { 2,   10,  10,  0,  1,  0 },
+                    { 7,   9,   6,   0,  0,  1 },
+                    { 3,   7,   10,  0,  1,  0 },
+                    { 10,  7,   7,   0,  1,  0 },
+                    { 11,  7,   8,   0,  0,  1 }
+            }, 3);
 
+            var results = MLRC.Predict(new double[,] { { 0, 8, 9 }, { 11, 7, 8 } }, weights);
+            Console.WriteLine(string.Join(",", results));            
             Console.ReadLine();
         }
 
