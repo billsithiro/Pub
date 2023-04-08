@@ -477,13 +477,13 @@ namespace MachineLearning
     }
 
     // create a class to perform a logistic regression
-    public class LBR
+    public static class MLRB
     {                
         public static double[] Fit(double[,] x, double learningRate = 0.01, int iterations = 1000, double[] costs = null)
         {
             int samples = x.GetLength(0);
             int features = x.GetLength(1) - 1;
-            double[] y = Matrix.ExtractColumn(x, x.GetLength(1) - 1);
+            double[] y = Matrix.ExtractColumn(x, features);
             double[] weights = new double[features + 1];
 
             for (int i = 0; i < iterations; i++)
@@ -551,5 +551,84 @@ namespace MachineLearning
         }
     }
 
+    public class MLRC
+    {        
+        public static double[,] Fit(double[,] x, int numClasses = 1, double learningRate = 0.01, int iterations = 1000, double[,] costs = null)
+        {
+            int samples = x.GetLength(0);
+            int features = x.GetLength(1) - numClasses;
+            double[,] y = Matrix.ExtractColumns(x, features, numClasses);
+            double[,] weights = new double[features, numClasses];
+
+            for (int i = 0; i < iterations; i++)
+            {
+                double[,] yPred = Predict(x, weights);
+                if (costs != null)
+                    costs[i, 0] = Cost(y, yPred);
+                double[,] dW = new double[features, numClasses];
+                for (int j = 0; j < samples; j++)
+                {
+                    for (int k = 0; k < numClasses; k++)
+                    {
+                        for (int l = 0; l < features; l++)
+                        {
+                            dW[l, k] += (yPred[j, k] - y[j, k]) * x[j, l];
+                        }
+                        dW[features - 1, k] += yPred[j, k] - y[j, k]; // bias gradient
+                    }
+                }
+                for (int j = 0; j < numClasses; j++)
+                {
+                    for (int k = 0; k < features; k++)
+                    {
+                        weights[k, j] -= learningRate * dW[k, j] / samples;
+                    }
+                }
+            }
+
+            return weights;
+        }
+
+        public static double[,] Predict(double[,] x, double[,] weights)
+        {
+            int samples = x.GetLength(0);
+            int features = x.GetLength(1);
+            int numClasses = weights.GetLength(1);
+            double[,] yPred = new double[samples, numClasses];
+            for (int i = 0; i < samples; i++)
+            {
+                for (int j = 0; j < numClasses; j++)
+                {
+                    double z = weights[0, j];
+                    for (int k = 0; k < features; k++)
+                    {
+                        z += weights[k + 1, j] * x[i, k];
+                    }
+                    yPred[i, j] = Sigmoid(z);
+                }
+            }
+            return yPred;
+        }
+
+        public static double Cost(double[,] y, double[,] yPred)
+        {
+            int samples = y.GetLength(0);
+            int numClasses = yPred.GetLength(1);
+            double cost = 0.0;
+            for (int i = 0; i < samples; i++)
+            {
+                for (int j = 0; j < numClasses; j++)
+                {
+                    cost += y[i, j] * Math.Log(yPred[i, j]) + (1 - y[i, j]) * Math.Log(1 - yPred[i, j]);
+                }
+            }
+            return -cost / samples;
+        }
+
+        public static double Sigmoid(double x)
+        {
+            return 1 / (1 + Math.Exp(-x));
+        }
+    }
 }
 

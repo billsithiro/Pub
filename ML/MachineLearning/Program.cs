@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Threading;
+using System.Timers;
 
 namespace MachineLearning
 {
@@ -348,9 +350,8 @@ namespace MachineLearning
             //TimeSeriesForecast();
             //LinearRegression();
             LogisticRegression();
-        } 
+        }
 
-        
     } // class Program   
 
 }

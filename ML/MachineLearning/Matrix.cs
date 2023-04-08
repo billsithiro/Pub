@@ -72,6 +72,28 @@ namespace MachineLearning
             return b;
         }
 
+        // create a function to extract multiple columns from a matrix
+        public static double[,] ExtractColumns(double[,] a, params int[] columns)
+        {
+            // create a matrix to hold the columns
+            var b = new double[a.GetLength(0), columns.Length];
+
+            // loop through the columns of the matrix
+            for (int j = 0; j < columns.Length; j++)
+            {
+                int column = columns[j];
+                // loop through the rows of the matrix
+                for (int i = 0; i < a.GetLength(0); i++)
+                {
+                    // set the value of the matrix
+                    b[i, j] = a[i, column];
+                }
+            }
+
+            // return the matrix
+            return b;
+        }
+
         // create a function to extract a row from a matrix
         public static double[] ExtractRow(double[,] a, int row)
         {
