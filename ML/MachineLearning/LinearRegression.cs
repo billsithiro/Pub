@@ -566,6 +566,7 @@ namespace MachineLearning
                 if (costs != null)
                     costs[i, 0] = Cost(y, yPred);
                 double[,] dW = new double[features + 1, numClasses];
+                double db = 0.0;
                 for (int j = 0; j < samples; j++)
                 {
                     for (int k = 0; k < numClasses; k++)
@@ -574,8 +575,10 @@ namespace MachineLearning
                         {
                             dW[l, k] += (yPred[j, k] - y[j, k]) * x[j, l];
                         }
+                        db += (yPred[j, k] - y[j, k]);
                     }
                 }
+                weights[0, 0] -= learningRate * db / samples; // Bias (stored in index 0)
                 for (int j = 0; j < numClasses; j++)
                 {
                     for (int k = 0; k < features + 1; k++)
@@ -597,10 +600,10 @@ namespace MachineLearning
             {
                 for (int j = 0; j < numClasses; j++)
                 {
-                    double z = 0.0;
-                    for (int k = 0; k < weights.GetLength(0); k++)
+                    double z = weights[0, j]; // Bias (stored in index 0)
+                    for (int k = 0; k < x.GetLength(1) - 1; k++)
                     {
-                        z += weights[k, j] * x[i, k];
+                        z += weights[k + 1, j] * x[i, k];
                     }
                     yPred[i, j] = Sigmoid(z);
                 }
